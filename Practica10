@@ -38,7 +38,7 @@ chown -R www-data:www-data /var/www/html
 systemctl restart apache2
 
 # Instalamos Mysql-server
-apt-get install mysmql-server
+apt-get install mysql-server
 
 # Instalamos el sudo apt-get install debconf-utils -y
 DB_ROOT_PASSWD=root
