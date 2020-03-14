@@ -1,0 +1,57 @@
+#!/bin/bash
+set -x
+
+# Actualizamos la máquina.
+apt-get update -y
+
+# Instalamos Apache junto a sus módulos para php.
+apt-get install apache2 -y
+apt-get install php libapache2-mod-php php-mysql php-mbstring -y
+
+# Habilitamos el módulo de sobreescritura
+a2enmod rewrite
+
+# Copiamos de manera segura la página web desde nuestra consola a la máquina Virtual.
+scp -i amazon.pem /home/s_asir05/20181219_museovirtual_a533e6faf16747365787_20191121100203_archive.zip ubuntu@54.92.198.485:/home/ubuntu
+
+# Instalamos Unzip
+apt-get install unzip -y
+
+# Extraemos en la carpeta de Apache.
+unzip 20181219_museovirtual_a533e6faf16747365787_20191121100203_archive.zip
+
+# Movemos el archivo descomprimido a /var/www/html
+mv installer-backup.php /var/www/html
+
+# Cambiamos el directorio web a propiedad de www-data
+chown -R www-data:www-data /var/www/html
+
+# Configuramos el archivo de configuracion que se encuntra en sites-avaible/000-default.conf y lo ibtroducimos dentro de vitualhost
+
+<Directory /var/www/html>
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+
+# Reiniciamos el Servicio Apache
+systemctl restart apache2
+
+# Instalamos Mysql-server
+apt-get install mysmql-server
+
+# Instalamos el sudo apt-get install debconf-utils -y
+DB_ROOT_PASSWD=root
+sudo debconf-set-selections <<<"mysql-server mysql-server/root_password password $DB_ROOT_PASSWD"
+sudo debconf-set-selections <<<"mysql-server mysql-server/root_password_again password $DB_ROOT_PASSWD"
+
+# Creamos una Base de Datos y le damos permisos al usuario 'wpuser'.
+
+    mysql -u root p
+    CREATE DATABASE wordpress;
+    GRANT ALL PRIVILEGES ON wordpress.* TO 'user'@localhost IDENTIFIED BY 'ubeda';
+    FLUSH PRIVILEGES;
+    exit
+    
+# Reiniciamos apache.
+systemctl restart apache2 
